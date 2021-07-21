@@ -1,0 +1,19 @@
+runtime: python38
+
+instance_class: F1
+
+env_variables:
+  MYSQL_USER: 'root'
+  MYSQL_PASSWORD: ''
+  MYSQL_DB: 'calometer'
+  MYSQL_HOST: '34.135.179.50'
+
+handlers:
+- url: /img
+  static_url: static/img
+
+- url: /script
+  static_url: static/script
+
+- url: /style
+  static_url: static/style
