@@ -14,6 +14,6 @@ def index():
     return app.send_static_file('index.html')
 
 
-@app.route('/api/time')
+@app.route('/api/search')
 def get_current_time():
-    return {'time': time.time()}
+    return {'food': "cake"}

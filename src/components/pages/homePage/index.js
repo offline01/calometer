@@ -14,12 +14,12 @@ class HomePageView extends React.Component {
     }
 
     searchFood() {
-        // fetch('/api/search')
-        //     .then(res => res.json())
-        //     .then(jsonStr => this.setState({foodName: jsonStr}
+        fetch('/api/search')
+            .then(res => res.json())
+            .then(jsonStr => this.setState({foodName: jsonStr['food']}))
 
         // dummy code below -> wait for backend API to be finished
-        this.setState({foodName: "suibian"})
+        // this.setState({foodName: "suibian"})
     }
 
     render() {
