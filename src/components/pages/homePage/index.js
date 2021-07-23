@@ -1,10 +1,25 @@
 import {Button, Grid, IconButton, InputAdornment, TextField, Typography} from '@material-ui/core'
 import {Search} from "@material-ui/icons";
 import React from "react";
+import {searchFood} from "../../../service/search-food";
+import fetch from "isomorphic-fetch";
 
 class HomePageView extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            foodName: undefined
+        }
+        this.searchFood = this.searchFood.bind(this);
+    }
+
+    searchFood() {
+        // fetch('/api/search')
+        //     .then(res => res.json())
+        //     .then(jsonStr => this.setState({foodName: jsonStr}
+
+        // dummy code below -> wait for backend API to be finished
+        this.setState({foodName: "suibian"})
     }
 
     render() {
@@ -35,7 +50,7 @@ class HomePageView extends React.Component {
                         fullWidth
                         InputProps={{endAdornment:
                                 <InputAdornment>
-                                    <IconButton onClick={() => { console.log('clicked') }}>
+                                    <IconButton onClick={this.searchFood}>
                                         <Search />
                                     </IconButton>
                                 </InputAdornment>}}
@@ -65,6 +80,10 @@ class HomePageView extends React.Component {
                             <TextField required id="standard-required" label="Maximum" defaultValue="0" />
                         </Grid>
                     </Grid>
+                </div>
+                <div className="SearchResult" style={{ padding: 20 }}>
+                    {this.state.foodName === undefined ?
+                        <div></div> : <Typography variant="subtitle1">{this.state.foodName}</Typography>}
                 </div>
             </div>
         )
