@@ -1,12 +1,10 @@
-from enum import unique
 from app import db
 
-def get_food_search_result(food_name: str, 
+def generate_food_search_query(food_name: str, 
 	protein_low: float, protein_high: float,
 	calorie_low: float, calorie_high: float,
 	fat_low: float, fat_high: float,
-	carbo_low: float, carbo_high: float) -> list:
-	'''Make the database query with the given parameter'''
+	carbo_low: float, carbo_high: float) -> str:
 
 	fields = '.fdc_id, f.Description, fn.nutrient_id, fn.Amount'
 	tables = 'Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
@@ -48,6 +46,20 @@ def get_food_search_result(food_name: str,
 				 'FROM {tables} '
 				 'WHERE {condition} '
 				 'ORDER BY {order};')
+
+	return query
+
+def get_food_search_result(food_name: str, 
+	protein_low: float, protein_high: float,
+	calorie_low: float, calorie_high: float,
+	fat_low: float, fat_high: float,
+	carbo_low: float, carbo_high: float) -> list:
+	'''Make the database query with the given parameter'''
+
+	query = generate_food_search_query(food_name, protein_low, protein_high,
+																		 calorie_low, calorie_high, 
+																		 fat_low, fat_high,
+																		 carbo_low, carbo_high)
 
 	connection = db.connect()
 	query_results = connection.execute(query).fetchall()
