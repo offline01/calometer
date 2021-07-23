@@ -1,3 +1,4 @@
+from enum import unique
 from app import db
 
 def get_food_search_result(food_name: str, 
@@ -50,6 +51,7 @@ def get_food_search_result(food_name: str,
 
 	connection = db.connect()
 	query_results = connection.execute(query).fetchall()
+	connection.close()
 
 	food_list = []
 
@@ -79,10 +81,41 @@ def get_food_search_result(food_name: str,
 	return food_list
 
 def register_user(register_email: str, user_name: str, password: str, 
-	first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
-	pass
+	first_name: str, last_name: str, date_of_birth: str, sex: int) -> bool:
+	unique_email_check_query = ('SELECT * '
+														  'FROM User_account '
+															'WHERE email = \'' + register_email + '\';')
 
-def update_user(user_id: int) -> None:
+	connection = db.connect()
+
+	unique_check = connection.execute(unique_email_check_query).first()
+	if unique_check == None:
+		return False
+
+	user_id_query = ('SELECT MAX(user_id) FROM User_profile;')
+	latest_id_check = connection.execute(user_id_query).fetchall()
+
+	new_user_id = 1
+	if len(latest_id_check) > 0:
+		new_user_id = latest_id_check[0][0] + 1
+
+	# order of insertion: email, user_id, user_name, password
+	account_insertion_query = ('INSERT INTO User_account (email, user_id, user_name, password)'
+					 									 'VALUES (\'' + register_email + '\', ' + str(new_user_id) + ', \'' + user_name + '\', \'' + password + '\');')
+
+	# order of insertion: user_id, last_name, first_name, date_of_birth, Sex
+	# note that the date_of_birth field must be in the form of yyyy-mm-dd 
+	profile_insertion_query = ('INSERT INTO User_profile (user_id, last_name, first_name, date_of_birth, Sex)'
+														 'VALUES (' + str(new_user_id) + ', \'' + last_name + '\', \'' + first_name + '\', \'' + date_of_birth + '\', ' + str(sex) + ');')
+
+	connection.execute(account_insertion_query)
+	connection.execute(profile_insertion_query)
+
+	connection.close()
+
+	return True
+
+def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
 	pass
 
 def delete_user(user_id: int) -> None:
