@@ -6,6 +6,7 @@ def generate_food_search_query(food_name: str,
 	fat_low: float, fat_high: float,
 	carbo_low: float, carbo_high: float) -> str:
 
+
 	fields = '.fdc_id, f.Description, fn.nutrient_id, fn.Amount'
 	tables = 'Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
 	condition = ''
@@ -93,7 +94,7 @@ def get_food_search_result(food_name: str,
 	return food_list
 
 def register_user(register_email: str, user_name: str, password: str, 
-	first_name: str, last_name: str, date_of_birth: str, sex: int) -> bool:
+	first_name: str, last_name: str, date_of_birth: str, sex: int) -> int:
 	unique_email_check_query = ('SELECT * '
 														  'FROM User_account '
 															'WHERE email = \'' + register_email + '\';')
@@ -102,7 +103,7 @@ def register_user(register_email: str, user_name: str, password: str,
 
 	unique_check = connection.execute(unique_email_check_query).first()
 	if unique_check == None:
-		return False
+		return -1
 
 	user_id_query = ('SELECT MAX(user_id) FROM User_profile;')
 	latest_id_check = connection.execute(user_id_query).fetchall()
@@ -125,7 +126,20 @@ def register_user(register_email: str, user_name: str, password: str,
 
 	connection.close()
 
-	return True
+	return new_user_id
+
+def login_user(provided_email: str, provided_pw: str) -> int:
+	login_request = ('SELECT user_id '
+	                 'FROM User_account '
+									 'WHERE email = \'' + provided_email + '\' AND password = \'' + provided_pw + '\';')
+
+	connection = db.connect()
+	login_user_id = connection.execute(login_request).first()
+
+	if login_user_id == None:
+		return -1
+	else:
+		return int(login_user_id[0])
 
 #def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
 def update_user_password(user_id: int, password: str) -> None:
@@ -140,6 +154,8 @@ def delete_user(user_id: int) -> None:
     query = 'Delete From User_account where id={};'.format(user_id)
     connection.execute(query)
     connection.close()
+
+
 
 def get_user_goals(user_id: int) -> None:
 	pass  
