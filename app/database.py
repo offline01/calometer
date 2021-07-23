@@ -127,11 +127,19 @@ def register_user(register_email: str, user_name: str, password: str,
 
 	return True
 
-def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
-	pass
+#def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
+def update_user_password(user_id: int, password: str) -> None:
+    connection = db.connect()
+    query = 'Update User_account set password = "{}" where id = {};'.format(text, user_id)
+    connection.execute(query)
+    connection.close()
 
 def delete_user(user_id: int) -> None:
-	pass
+    """ remove entries based on user ID """
+    connection = db.connect()
+    query = 'Delete From User_account where id={};'.format(user_id)
+    connection.execute(query)
+    connection.close()
 
 def get_user_goals(user_id: int) -> None:
 	pass  
