@@ -130,7 +130,7 @@ def register_user(register_email: str, user_name: str, password: str,
 #def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
 def update_user_password(user_id: int, password: str) -> None:
     connection = db.connect()
-    query = 'Update User_account set password = "{}" where id = {};'.format(text, user_id)
+    query = 'Update User_account set password = "{}" where id = {};'.format(password, user_id)
     connection.execute(query)
     connection.close()
 
