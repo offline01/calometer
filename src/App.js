@@ -3,6 +3,7 @@ import { BrowserRouter, Link, Switch, Route } from 'react-router-dom';
 import './App.css';
 import HomePageView from "./components/pages/homePage";
 import Login from "./components/pages/loginPage";
+import {SignUp} from "./components/pages/mf/Signup";
 
 function App() {
   const [currentTime, setCurrentTime] = useState(0);
@@ -24,6 +25,8 @@ function App() {
           <Switch>
             <Route exact path="/" component={HomePageView}></Route>
             <Route path="/login" component={Login}></Route>
+            <Route path="/signup" component={SignUp}></Route>
+
           </Switch>
         </BrowserRouter>
       </div>
