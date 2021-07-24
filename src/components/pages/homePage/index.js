@@ -39,6 +39,7 @@ class HomePageView extends React.Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         }
+        console.log(args)
         fetch('/api/food_search', args)
             .then(res => res.json())
             .then(jsonStr => this.setState({foods: jsonStr['foods']}))
@@ -116,7 +117,7 @@ class HomePageView extends React.Component {
                 </div>
                 <div className="SearchResult" style={{ padding: 20 }}>
                     {this.state.foods === [] ?
-                        <div></div> : <Typography variant="subtitle1">{this.state.foods.map(food => <div>{food.name}</div>)}</Typography>}
+                        <div></div> : <Typography variant="subtitle1">{this.state.foods.map(food => <div>{food['food_name']}</div>)}</Typography>}
                 </div>
             </div>
         )
