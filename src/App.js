@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Link, Switch, Route } from 'react-router-dom';
-import logo from './logo.svg';
 import './App.css';
-import {IconButton, InputAdornment, TextField} from "@material-ui/core";
-import {Search} from "@material-ui/icons";
 import HomePageView from "./components/pages/homePage";
+import Login from "./components/pages/loginPage";
 
 function App() {
   const [currentTime, setCurrentTime] = useState(0);
@@ -16,9 +14,19 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <HomePageView></HomePageView>
-    </div>
+      <div className="App">
+        <BrowserRouter>
+          <div>
+            <Link className="App-link" to="/">Home</Link>
+            &nbsp;|&nbsp;
+            <Link className="App-link" to="/login">Login</Link>
+          </div>
+          <Switch>
+            <Route exact path="/" component={HomePageView}></Route>
+            <Route path="/login" component={Login}></Route>
+          </Switch>
+        </BrowserRouter>
+      </div>
   );
 }
 
