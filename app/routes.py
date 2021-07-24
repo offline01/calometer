@@ -4,7 +4,7 @@ from app import database as db_helper
 
 
 @app.route('/api/food_search', methods=['POST'])
-def homepage():
+def search_food():
 	if request.method == 'POST':
 		submitted_search_parameters = request.get_json()
 
@@ -25,10 +25,11 @@ def homepage():
 
 		search_result = db_helper.get_food_search_result(name, protein_low, protein_high, calorie_low, calorie_high, fat_low, fat_high, carbo_low, carbo_high)
 
-		return search_result
+		returned_info = list()
+		returned_info.append({'status': 'success'})
+		returned_info.append(search_result)
 
-
-	return render_template('test_template.html', name='cyka blyat')
+		return returned_info
 
 @app.route('/api/user/register', methods=['POST'])
 def register():
@@ -46,9 +47,9 @@ def register():
 
 		new_user_id = db_helper.register_user(email, user_name, password, first_name, last_name, date_of_birth, sex)
 		if new_user_id != -1:
-			return {'new_user_id': str(new_user_id)}
+			return [{'status': 'success'}, {'new_user_id': str(new_user_id)}]
 		else:
-			return {'new_user_id': 'Failed'}
+			return [{'status': 'failed'}]
 		
 		# return redirect(url_for("add_goals"))
 	else:
@@ -64,15 +65,22 @@ def login():
 
 		logged_in_user_id = db_helper.login_user(email, password)
 
-		if logged_in_user_id == -1:
-			return {'current_user': 'failed'}
+		if logged_in_user_id != -1:
+			return [{'status': 'success'}, {'current_user': str(logged_in_user_id)}]
 		else:
-			return {'current_user': str(logged_in_user_id)}
+			return [{'status': 'failed'}]
 
-	else:
-		return render_template('test_template.html', name='cyka blyat')
+@app.route('/api/user/change_password', methods=['POST'])
+def change_pwd():
+	if request.method == 'POST':
+		pwd_change_info = request.get_json()
 
-@app.route('/api/user/change_password')
+		email = pwd_change_info['email']
+		new_pwd = pwd_change_info['pwd']
+
+		db_helper.update_user_password(email, new_pwd)
+
+		return [{'status': 'success'}]
 
 @app.route('/api/goals/get_user_goals', methods=['POST'])
 def goals():
