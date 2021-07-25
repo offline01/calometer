@@ -1,25 +1,58 @@
 import {Button, Grid, IconButton, InputAdornment, TextField, Typography} from '@material-ui/core'
 import {Search} from "@material-ui/icons";
 import React from "react";
-import {searchFood} from "../../../service/search-food";
 import fetch from "isomorphic-fetch";
 
 class HomePageView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            foodName: undefined
+            foods: [],
+            name: undefined,
+            c_low: -1,
+            c_high: -1,
+            p_low: -1,
+            p_high: -1,
+            f_low: -1,
+            f_high: -1,
+            ch_low: -1,
+            ch_high: -1
         }
         this.searchFood = this.searchFood.bind(this);
+        this.handelSearchBoxChange = this.handelSearchBoxChange.bind(this);
     }
 
     searchFood() {
-        fetch('/api/search')
+        const body = {
+            name: this.state.name,
+            c_low: this.state.c_low,
+            c_high: this.state.c_high,
+            p_low: this.state.p_low,
+            p_high: this.state.p_low,
+            f_low: this.state.f_low,
+            f_high: this.state.f_high,
+            ch_low: this.state.ch_low,
+            ch_high: this.state.ch_low
+        }
+        const args = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }
+        console.log(args)
+        fetch('/api/food_search', args)
             .then(res => res.json())
-            .then(jsonStr => this.setState({foodName: jsonStr['food']}))
+            .then(jsonStr => this.setState({foods: jsonStr['foods']}))
 
         // dummy code below -> wait for backend API to be finished
         // this.setState({foodName: "suibian"})
+    }
+
+    handelSearchBoxChange(e) {
+        this.setState({
+            name: e.target.value
+        })
+        // console.log(this.state.name) //test
     }
 
     render() {
@@ -54,6 +87,7 @@ class HomePageView extends React.Component {
                                         <Search />
                                     </IconButton>
                                 </InputAdornment>}}
+                        onChange={this.handelSearchBoxChange}
                     ></TextField>
                 </div>
                 <div className="Filters">
@@ -82,8 +116,8 @@ class HomePageView extends React.Component {
                     </Grid>
                 </div>
                 <div className="SearchResult" style={{ padding: 20 }}>
-                    {this.state.foodName === undefined ?
-                        <div></div> : <Typography variant="subtitle1">{this.state.foodName}</Typography>}
+                    {this.state.foods === [] ?
+                        <div></div> : <Typography variant="subtitle1">{this.state.foods.map(food => <div>{food['food name']}</div>)}</Typography>}
                 </div>
             </div>
         )

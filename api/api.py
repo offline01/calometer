@@ -16,4 +16,10 @@ def index():
 
 @app.route('/api/search')
 def get_current_time():
-    return {'food': "cake"}
+    return {'foods': [{
+        'name': 'cake1',
+        'status': 'cold'
+    },
+    {'name': 'cake2',
+     'status': 'cold2'
+    }]}
