@@ -65,7 +65,7 @@ def init_connect_engine() -> sqlalchemy.engine.Engine:
 
 db = init_connect_engine()
 
-# conn = db.connect()
-# conn.execute()
+from app import database
+print(database.login_user('foo2@foo.org', 'foo2foo2'))
 
 from app import routes

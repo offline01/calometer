@@ -1,22 +1,20 @@
 from app import db
 
-def generate_food_search_query(food_name: str, 
-	protein_low: float, protein_high: float,
-	calorie_low: float, calorie_high: float,
-	fat_low: float, fat_high: float,
-	carbo_low: float, carbo_high: float) -> str:
+def generate_food_search_query(food_name: str = '', 
+	protein_low: float =-1, protein_high: float =-1,
+	calorie_low: float =-1, calorie_high: float =-1,
+	fat_low: float =-1, fat_high: float =-1,
+	carbo_low: float =-1, carbo_high: float =-1) -> str:
 
-	query = ''
+	subquery = ''
 
 	if food_name != '':
-		keyword_search_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
-														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
-														'WHERE f.Description LIKE \'%%' + food_name + '%%\')')
+		keyword_search_query = '(SELECT f.fdc_id FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id WHERE f.Description LIKE \'%%' + food_name + '%%\')'
 
-		query += keyword_search_query
+		subquery += keyword_search_query
 
 	if protein_low != -1 or protein_high != -1:
-		protein_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+		protein_filter_query = ('(SELECT f.fdc_id '
 														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
 														'WHERE fn.nutrient_id = 1003 AND ')
 
@@ -27,10 +25,13 @@ def generate_food_search_query(food_name: str,
 		else:
 			protein_filter_query += 'fn.Amount <= ' + str(protein_high) + ')'
 
-		query += ' UNION ' + protein_filter_query
+		if subquery != '':
+			subquery += ' INTERSECT ' 
+			
+		subquery += protein_filter_query
 
 	if calorie_low != -1 or calorie_high != -1:
-		calorie_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+		calorie_filter_query = ('(SELECT f.fdc_id '
 														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
 														'WHERE fn.nutrient_id = 1008 AND ')
 
@@ -41,12 +42,15 @@ def generate_food_search_query(food_name: str,
 		else:
 			calorie_filter_query += 'fn.Amount <= ' + str(calorie_high) + ')'
 
-		query += ' UNION ' + calorie_filter_query
+		if subquery != '':
+			subquery += ' INTERSECT ' 
+
+		subquery += calorie_filter_query
 
 	if fat_low != -1 or fat_high != -1:
-		fat_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
-														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
-														'WHERE fn.nutrient_id = 1085 AND ')
+		fat_filter_query = ('(SELECT f.fdc_id '
+												'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+												'WHERE fn.nutrient_id = 1085 AND ')
 
 		if fat_low != -1 and fat_high != -1:
 			fat_filter_query += 'fn.Amount >= ' + str(fat_low) + ' AND fn.Amount <= ' + str(fat_high) + ')'
@@ -55,12 +59,15 @@ def generate_food_search_query(food_name: str,
 		else:
 			fat_filter_query += 'fn.Amount <= ' + str(fat_high) + ')'
 
-		query += ' UNION ' + fat_filter_query
+		if subquery != '':
+			subquery += ' INTERSECT '
+
+		subquery += fat_filter_query
 
 	if carbo_low != -1 or carbo_high != -1:
-		carbo_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
-														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
-														'WHERE fn.nutrient_id = 1085 AND ')
+		carbo_filter_query = ('(SELECT f.fdc_id '
+												  'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+													'WHERE fn.nutrient_id = 1085 AND ')
 
 		if carbo_low != -1 and carbo_high != -1:
 			carbo_filter_query += 'fn.Amount >= ' + str(carbo_low) + ' AND fn.Amount <= ' + str(carbo_high) + ')'
@@ -69,17 +76,27 @@ def generate_food_search_query(food_name: str,
 		else:
 			carbo_filter_query += 'fn.Amount <= ' + str(carbo_high) + ')'
 
-		query += ' UNION ' + carbo_filter_query
+		if subquery != '':
+			subquery += ' INTERSECT '
+
+		subquery += carbo_filter_query
 
 	#TODO The above are subqueries. Write the main query.
+	query = ('SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+					 'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id ')
+
+	if subquery != '':
+		query += 'WHERE f.fdc_id IN (' + subquery + ') '
+
+	query += 'ORDER BY f.fdc_id, fn.nutrient_id;'
 
 	return query
 
-def get_food_search_result(food_name: str, 
-	protein_low: float, protein_high: float,
-	calorie_low: float, calorie_high: float,
-	fat_low: float, fat_high: float,
-	carbo_low: float, carbo_high: float) -> list:
+def get_food_search_result(food_name: str = '', 
+	protein_low: float = -1, protein_high: float = -1,
+	calorie_low: float = -1, calorie_high: float = -1,
+	fat_low: float = -1, fat_high: float = -1,
+	carbo_low: float = -1, carbo_high: float = -1) -> list:
 	'''Make the database query with the given parameter'''
 
 	query = generate_food_search_query(food_name, protein_low, protein_high,
@@ -90,6 +107,8 @@ def get_food_search_result(food_name: str,
 	connection = db.connect()
 	query_results = connection.execute(query).fetchall()
 	connection.close()
+
+	#print(query_results)
 
 	food_list = []
 
@@ -105,6 +124,7 @@ def get_food_search_result(food_name: str,
 			current_fdc_id = result_tuple[0]
 
 			if 'protein' not in fn_item:
+				print('1 triggered')
 				fn_item['protein'] = 'n/a'
 			if 'calories' not in fn_item:
 				fn_item['calories'] = 'n/a'
@@ -123,10 +143,11 @@ def get_food_search_result(food_name: str,
 			fn_item['calories'] = result_tuple[3]
 		elif result_tuple[2] == 1085:
 			fn_item['fat'] = result_tuple[3]
-		elif result_tuple[2] == 2039:
+		elif result_tuple[2] == 1050:
 			fn_item['carbohydrate'] = result_tuple[3]
 
 	if 'protein' not in fn_item:
+		print('1 triggered')
 		fn_item['protein'] = 'n/a'
 	if 'calories' not in fn_item:
 		fn_item['calories'] = 'n/a'
@@ -152,24 +173,28 @@ def register_user(register_email: str, user_name: str, password: str,
 		return -1
 
 	user_id_query = ('SELECT MAX(user_id) FROM User_profile;')
-	latest_id_check = connection.execute(user_id_query).fetchall()
+	latest_id_check = connection.execute(user_id_query).first()
+
+	print(latest_id_check)
 
 	new_user_id = 1
-	if len(latest_id_check) > 0:
-		new_user_id = latest_id_check[0][0] + 1
+	if latest_id_check[0] != None:
+		new_user_id = latest_id_check[0] + 1
 
+
+	
+	profile_insertion_query = ('INSERT INTO User_profile (user_id, last_name, first_name, date_of_birth, Sex) '
+														 'VALUES (' + str(new_user_id) + ', \'' + last_name + '\', \'' + first_name + '\', \'' + date_of_birth + '\', ' + str(sex) + ');')
 	# order of insertion: email, user_id, user_name, password
-	account_insertion_query = ('INSERT INTO User_account (email, user_id, user_name, password)'
+	account_insertion_query = ('INSERT INTO User_account (email, user_id, user_name, password) '
 					 									 'VALUES (\'' + register_email + '\', ' + str(new_user_id) + ', \'' + user_name + '\', \'' + password + '\');')
 
 	# order of insertion: user_id, last_name, first_name, date_of_birth, Sex
 	# note that the date_of_birth field must be in the form of yyyy-mm-dd 
-	profile_insertion_query = ('INSERT INTO User_profile (user_id, last_name, first_name, date_of_birth, Sex)'
-														 'VALUES (' + str(new_user_id) + ', \'' + last_name + '\', \'' + first_name + '\', \'' + date_of_birth + '\', ' + str(sex) + ');')
-
-	connection.execute(account_insertion_query)
+	
 	connection.execute(profile_insertion_query)
-
+	connection.execute(account_insertion_query)
+	
 	connection.close()
 
 	return new_user_id
@@ -182,6 +207,8 @@ def login_user(provided_email: str, provided_pw: str) -> int:
 	connection = db.connect()
 	login_user_id = connection.execute(login_request).first()
 
+	print(login_user_id)
+
 	if login_user_id == None:
 		return -1
 	else:
@@ -190,15 +217,15 @@ def login_user(provided_email: str, provided_pw: str) -> int:
 #def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
 def update_user_password(user_id: int, password: str) -> None:
     connection = db.connect()
-    query = 'Update User_account set password = "{}" where id = {};'.format(password, user_id)
+    query = 'Update user_account set password = "{}" where id = {};'.format(password, user_id)
     connection.execute(query)
     connection.close()
 
 def delete_user(user_id: int) -> None:
     """ remove entries based on user ID """
     connection = db.connect()
-    query = 'Delete From User_account where id={};'.format(user_id)
-    connection.execute(query)
+    account_deletion = 'Delete From user_profile where id={};'.format(user_id)
+    connection.execute(account_deletion)
     connection.close()
 
 
