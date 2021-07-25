@@ -7,14 +7,14 @@ app = Flask(__name__)
 
 
 def init_connect_engine() -> sqlalchemy.engine.Engine:
-	if os.environ.get('GAE_ENV') != 'standard':
-		# GAE_ENV appears on GCP
-		# we are on a local machine here
-		variables = load(open('app.yaml'), Loader=Loader)
-		env_variables = variables['env_variables']
+	# if os.environ.get('GAE_ENV') != 'standard':
+	# 	# GAE_ENV appears on GCP
+	# 	# we are on a local machine here
+	# 	variables = load(open('app.yaml'), Loader=Loader)
+	# 	env_variables = variables['env_variables']
 
-		for var in env_variables:
-			os.environ[var] = env_variables[var]
+	# 	for var in env_variables:
+	# 		os.environ[var] = env_variables[var]
 
 	db_config = {
         # [START cloud_sql_mysql_sqlalchemy_limit]
@@ -65,5 +65,7 @@ def init_connect_engine() -> sqlalchemy.engine.Engine:
 
 db = init_connect_engine()
 
+# conn = db.connect()
+# conn.execute()
 
 from app import routes

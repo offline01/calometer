@@ -1,35 +1,40 @@
 from app import app
-from flask import render_template, request, Response, redirect, url_for
+from flask import json, render_template, request, jsonify
+import json
 from app import database as db_helper
 
+@app.route('/api/test_response', methods=['POST'])
+def test_response():
+	test_info = request.get_json()
+
+	print(test_info)
+
+	return jsonify({'fuck':'you', 'cyka':'blyat', 'wdnmd':'nmsl', 'sent':test_info['sent']})
 
 @app.route('/api/food_search', methods=['POST'])
 def search_food():
 	if request.method == 'POST':
 		submitted_search_parameters = request.get_json()
 
-		## somehow grab data from the incoming json\
+		print(submitted_search_parameters)
+
 		name = submitted_search_parameters['name']
 
-		protein_low = submitted_search_parameters['p_low']
-		protein_high = submitted_search_parameters['p_high']
+		protein_low = float( submitted_search_parameters['p_low'] )
+		protein_high = float( submitted_search_parameters['p_high'] )
 
-		calorie_low = submitted_search_parameters['c_low']
-		calorie_high = submitted_search_parameters['c_high']
+		calorie_low = float(submitted_search_parameters['c_low'] )
+		calorie_high = float(submitted_search_parameters['c_high'] )
 
-		fat_low = submitted_search_parameters['f_low']
-		fat_high = submitted_search_parameters['f_high']
+		fat_low = float(submitted_search_parameters['f_low'] )
+		fat_high = float(submitted_search_parameters['f_high'] )
 
-		carbo_low = submitted_search_parameters['ch_low']
-		carbo_high = submitted_search_parameters['ch_high']
+		carbo_low = float(submitted_search_parameters['ch_low'] )
+		carbo_high = float(submitted_search_parameters['ch_high'] )
 
 		search_result = db_helper.get_food_search_result(name, protein_low, protein_high, calorie_low, calorie_high, fat_low, fat_high, carbo_low, carbo_high)
 
-		returned_info = list()
-		returned_info.append({'status': 'success'})
-		returned_info.append(search_result)
-
-		return returned_info
+		return jsonify({'status':'success', 'search_result': search_result})
 
 @app.route('/api/user/register', methods=['POST'])
 def register():
@@ -47,13 +52,9 @@ def register():
 
 		new_user_id = db_helper.register_user(email, user_name, password, first_name, last_name, date_of_birth, sex)
 		if new_user_id != -1:
-			return [{'status': 'success'}, {'new_user_id': str(new_user_id)}]
+			return jsonify({'status': 'success', 'new_user_id': new_user_id})
 		else:
-			return [{'status': 'failed'}]
-		
-		# return redirect(url_for("add_goals"))
-	else:
-		return render_template('test_template.html', name='cyka blyat')
+			return jsonify({'status': 'failed'})
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
@@ -66,9 +67,9 @@ def login():
 		logged_in_user_id = db_helper.login_user(email, password)
 
 		if logged_in_user_id != -1:
-			return [{'status': 'success'}, {'current_user': str(logged_in_user_id)}]
+			return jsonify({'status': 'success', 'current_user': logged_in_user_id})
 		else:
-			return [{'status': 'failed'}]
+			return jsonify({'status': 'failed'})
 
 @app.route('/api/user/change_password', methods=['POST'])
 def change_pwd():
@@ -80,7 +81,19 @@ def change_pwd():
 
 		db_helper.update_user_password(email, new_pwd)
 
-		return [{'status': 'success'}]
+		return jsonify({'status': 'success'})
+
+@app.route('/api/user/delete_user', methods=['POST'])
+def delete_account():
+	if request.method == 'POST':
+
+		target_account = request.get_json()
+
+		target_user_id = target_account['user_id']
+
+		db_helper.delete_user(target_user_id)
+
+		return jsonify({'status': 'success'})	
 
 @app.route('/api/goals/get_user_goals', methods=['POST'])
 def goals():

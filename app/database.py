@@ -6,48 +6,72 @@ def generate_food_search_query(food_name: str,
 	fat_low: float, fat_high: float,
 	carbo_low: float, carbo_high: float) -> str:
 
-	condition = ''
+	query = ''
+
 	if food_name != '':
-		condition += 'f.Description LIKE \'%%' + food_name + '%%\''
-	else:
-		condition += '1 = 1'
+		keyword_search_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+														'WHERE f.Description LIKE \'%%' + food_name + '%%\')')
 
-	if protein_low != -1 and protein_high != -1:
-		condition += ' AND (fn.nutrient_id = 1003 AND fn.Amount >= ' + str(protein_low) + ' AND fn.Amount <= ' + str(protein_high) + ')'
-	elif protein_low == -1 and protein_high != -1:
-		condition += ' AND (fn.nutrient_id = 1003 AND fn.Amount <= ' + str(protein_high) + ')'
-	elif protein_low != -1 and protein_high == -1:
-		condition += ' AND (fn.nutrient_id = 1003 AND fn.Amount >= ' + str(protein_low) + ')'
+		query += keyword_search_query
 
-	if calorie_low != -1 and calorie_high != -1:
-		condition += ' AND (fn.nutrient_id = 1008 AND fn.Amount >= ' + str(calorie_low) + ' AND fn.Amount <= ' + str(calorie_high) + ')'
-	elif calorie_low == -1 and calorie_high != -1:
-		condition += ' AND (fn.nutrient_id = 1008 AND fn.Amount <= ' + str(calorie_high) + ')'
-	elif calorie_low != -1 and calorie_high == -1:
-		condition += ' AND (fn.nutrient_id = 1008 AND fn.Amount >= ' + str(calorie_low) + ')'
+	if protein_low != -1 or protein_high != -1:
+		protein_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+														'WHERE fn.nutrient_id = 1003 AND ')
 
-	if fat_low != -1 and fat_high != -1:
-		condition += ' AND (fn.nutrient_id = 1085 AND fn.Amount >= ' + str(fat_low) + ' AND fn.Amount <= ' + str(fat_high) + ')'
-	elif fat_low == -1 and fat_high != -1:
-		condition += ' AND (fn.nutrient_id = 1085 AND fn.Amount <= ' + str(fat_high) + ')'
-	elif fat_low != -1 and fat_high == -1:
-		condition += ' AND (fn.nutrient_id = 1085 AND fn.Amount >= ' + str(fat_low) + ')'
+		if protein_low != -1 and protein_high != -1:
+			protein_filter_query += 'fn.Amount >= ' + str(protein_low) + ' AND fn.Amount <= ' + str(protein_high) + ')'
+		elif protein_low != -1:
+			protein_filter_query += 'fn.Amount >= ' + str(protein_low) + ')'
+		else:
+			protein_filter_query += 'fn.Amount <= ' + str(protein_high) + ')'
 
-	if carbo_low != -1 and carbo_high != -1:
-		condition += ' AND (fn.nutrient_id = 2039 AND fn.Amount >= ' + str(carbo_low) + ' AND fn.Amount <= ' + str(carbo_high) + ')'
-	elif carbo_low == -1 and carbo_high != -1:
-		condition += ' AND (fn.nutrient_id = 2039 AND fn.Amount <= ' + str(carbo_high) + ')'
-	elif carbo_low != -1 and carbo_high == -1:
-		condition += ' AND (fn.nutrient_id = 2039 AND fn.Amount >= ' + str(carbo_low) + ')'
+		query += ' UNION ' + protein_filter_query
 
-	order = 'f.fdc_id'
+	if calorie_low != -1 or calorie_high != -1:
+		calorie_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+														'WHERE fn.nutrient_id = 1008 AND ')
 
-	query = 'SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+		if calorie_low != -1 and calorie_high != -1:
+			calorie_filter_query += 'fn.Amount >= ' + str(calorie_low) + ' AND fn.Amount <= ' + str(calorie_high) + ')'
+		elif calorie_low != -1:
+			calorie_filter_query += 'fn.Amount >= ' + str(calorie_low) + ')'
+		else:
+			calorie_filter_query += 'fn.Amount <= ' + str(calorie_high) + ')'
 
-	if len(condition) > 0:
-		query += 'WHERE ' + condition
+		query += ' UNION ' + calorie_filter_query
 
-	query += ' ORDER BY f.fdc_id;'
+	if fat_low != -1 or fat_high != -1:
+		fat_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+														'WHERE fn.nutrient_id = 1085 AND ')
+
+		if fat_low != -1 and fat_high != -1:
+			fat_filter_query += 'fn.Amount >= ' + str(fat_low) + ' AND fn.Amount <= ' + str(fat_high) + ')'
+		elif fat_low != -1:
+			fat_filter_query += 'fn.Amount >= ' + str(fat_low) + ')'
+		else:
+			fat_filter_query += 'fn.Amount <= ' + str(fat_high) + ')'
+
+		query += ' UNION ' + fat_filter_query
+
+	if carbo_low != -1 or carbo_high != -1:
+		carbo_filter_query = ('(SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount '
+														'FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+														'WHERE fn.nutrient_id = 1085 AND ')
+
+		if carbo_low != -1 and carbo_high != -1:
+			carbo_filter_query += 'fn.Amount >= ' + str(carbo_low) + ' AND fn.Amount <= ' + str(carbo_high) + ')'
+		elif carbo_low != -1:
+			carbo_filter_query += 'fn.Amount >= ' + str(carbo_low) + ')'
+		else:
+			carbo_filter_query += 'fn.Amount <= ' + str(carbo_high) + ')'
+
+		query += ' UNION ' + carbo_filter_query
+
+	#TODO The above are subqueries. Write the main query.
 
 	return query
 
@@ -124,7 +148,7 @@ def register_user(register_email: str, user_name: str, password: str,
 	connection = db.connect()
 
 	unique_check = connection.execute(unique_email_check_query).first()
-	if unique_check == None:
+	if unique_check != None:
 		return -1
 
 	user_id_query = ('SELECT MAX(user_id) FROM User_profile;')
