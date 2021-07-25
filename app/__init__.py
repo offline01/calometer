@@ -56,7 +56,7 @@ def init_connect_engine() -> sqlalchemy.engine.Engine:
 						# 	database=os.environ.get('MTSQL_DB'), 				# db name
 						# 	host=os.environ.get('MYSQL_HOST') 					#ip
 						# ),
-						'mysql+pymysql://root:@34.135.179.50:3306/calometer',
+						'mysql+pymysql://root:123456789@127.0.0.1:3306/calometer',
 
 						**db_config
 	)
@@ -65,9 +65,5 @@ def init_connect_engine() -> sqlalchemy.engine.Engine:
 
 db = init_connect_engine()
 
-# connection = db.connect()
-# results = connection.execute('select * from Food limit 5;').fetchall()
-# print([x for x in results])
-# connection.close()
 
 from app import routes

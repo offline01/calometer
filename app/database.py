@@ -6,12 +6,11 @@ def generate_food_search_query(food_name: str,
 	fat_low: float, fat_high: float,
 	carbo_low: float, carbo_high: float) -> str:
 
-
-	fields = '.fdc_id, f.Description, fn.nutrient_id, fn.Amount'
-	tables = 'Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
 	condition = ''
 	if food_name != '':
-		condition += 'f.Description LIKE \'%' + food_name + '%\''
+		condition += 'f.Description LIKE \'%%' + food_name + '%%\''
+	else:
+		condition += '1 = 1'
 
 	if protein_low != -1 and protein_high != -1:
 		condition += ' AND (fn.nutrient_id = 1003 AND fn.Amount >= ' + str(protein_low) + ' AND fn.Amount <= ' + str(protein_high) + ')'
@@ -43,10 +42,12 @@ def generate_food_search_query(food_name: str,
 
 	order = 'f.fdc_id'
 
-	query = ('SELECT {fields} '
-				 'FROM {tables} '
-				 'WHERE {condition} '
-				 'ORDER BY {order};')
+	query = 'SELECT f.fdc_id, f.Description, fn.nutrient_id, fn.Amount FROM Food f JOIN Food_nutrient fn ON f.fdc_id = fn.fdc_id '
+
+	if len(condition) > 0:
+		query += 'WHERE ' + condition
+
+	query += ' ORDER BY f.fdc_id;'
 
 	return query
 
@@ -71,25 +72,46 @@ def get_food_search_result(food_name: str,
 	fn_item = dict()
 	current_fdc_id = -1
 	for result_tuple in query_results:
+
+
 		if current_fdc_id == -1:
-			fn_item['food name'] = result_tuple[1]
+			fn_item['food_name'] = result_tuple[1]
 			current_fdc_id = result_tuple[0]
 		elif current_fdc_id != result_tuple[0]:
 			current_fdc_id = result_tuple[0]
+
+			if 'protein' not in fn_item:
+				fn_item['protein'] = 'n/a'
+			if 'calories' not in fn_item:
+				fn_item['calories'] = 'n/a'
+			if 'fat' not in fn_item:
+				fn_item['fat'] =  'n/a'
+			if 'carbohydrate' not in fn_item:
+				fn_item['carbohydrate'] = 'n/a'
+
 			food_list.append(fn_item)
-
 			fn_item.clear()
+			fn_item['food_name'] = result_tuple[1]
 
-			fn_item['food name'] = result_tuple[1]
+		if result_tuple[2] == 1003:
+			fn_item['protein'] = result_tuple[3]
+		elif result_tuple[2] == 1008:
+			fn_item['calories'] = result_tuple[3]
+		elif result_tuple[2] == 1085:
+			fn_item['fat'] = result_tuple[3]
+		elif result_tuple[2] == 2039:
+			fn_item['carbohydrate'] = result_tuple[3]
 
-		if result_tuple[3] == 1003:
-			fn_item['protein'] = result_tuple[4]
-		elif result_tuple[3] == 1008:
-			fn_item['calories'] = result_tuple[4]
-		elif result_tuple[3] == 1085:
-			fn_item['fat'] = result_tuple[4]
-		elif result_tuple[3] == 2039:
-			fn_item['carbohydrate'] = result_tuple[4]
+	if 'protein' not in fn_item:
+		fn_item['protein'] = 'n/a'
+	if 'calories' not in fn_item:
+		fn_item['calories'] = 'n/a'
+	if 'fat' not in fn_item:
+		fn_item['fat'] =  'n/a'
+	if 'carbohydrate' not in fn_item:
+		fn_item['carbohydrate'] = 'n/a'
+
+	food_list.append(fn_item)
 
 	return food_list
 
