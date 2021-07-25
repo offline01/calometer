@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./Login.css";
-
+import { Link } from "react-router-dom";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -35,6 +35,9 @@ export default function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </Form.Group>
+
+                <Link to="/login/reset">Forgot password?</Link> 
+    
                 <Button block size="lg" type="submit" disabled={!validateForm()}>
                     Login
                 </Button>
