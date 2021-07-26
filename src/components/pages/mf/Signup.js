@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import "./Signup.css";
 
 
-class App extends React.Component {
+class Signup extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
@@ -88,4 +88,4 @@ class App extends React.Component {
     }
   }
   
-  export default App;
+  export default Signup;
