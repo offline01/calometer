@@ -108,18 +108,18 @@ def get_food_search_result(food_name: str = '',
 	query_results = connection.execute(query).fetchall()
 	connection.close()
 
+	# print(query_results)
+
 	food_list = []
 
 	fn_item = dict()
 	current_fdc_id = -1
 	for result_tuple in query_results:
 
-
 		if current_fdc_id == -1:
 			fn_item['food_name'] = result_tuple[1]
 			current_fdc_id = result_tuple[0]
 		elif current_fdc_id != result_tuple[0]:
-			current_fdc_id = result_tuple[0]
 
 			if 'protein' not in fn_item:
 				fn_item['protein'] = 'n/a'
@@ -131,7 +131,9 @@ def get_food_search_result(food_name: str = '',
 				fn_item['carbohydrate'] = 'n/a'
 
 			food_list.append(fn_item)
-			fn_item.clear()
+			del fn_item
+			fn_item = dict()
+			current_fdc_id = result_tuple[0]
 			fn_item['food_name'] = result_tuple[1]
 
 		if result_tuple[2] == 1003:
@@ -144,7 +146,6 @@ def get_food_search_result(food_name: str = '',
 			fn_item['carbohydrate'] = result_tuple[3]
 
 	if 'protein' not in fn_item:
-		print('1 triggered')
 		fn_item['protein'] = 'n/a'
 	if 'calories' not in fn_item:
 		fn_item['calories'] = 'n/a'
@@ -154,6 +155,8 @@ def get_food_search_result(food_name: str = '',
 		fn_item['carbohydrate'] = 'n/a'
 
 	food_list.append(fn_item)
+
+	print(food_list)
 
 	return food_list
 

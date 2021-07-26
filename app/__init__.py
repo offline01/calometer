@@ -65,4 +65,7 @@ def init_connect_engine() -> sqlalchemy.engine.Engine:
 
 db = init_connect_engine()
 
+# from app import database
+# database.get_food_search_result(food_name='angus')
+
 from app import routes
