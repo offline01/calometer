@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Link, Switch, Route } from 'react-router-dom';
-import './App.css';
+// import './App.css';
 import HomePageView from "./components/pages/homePage";
 import Login from "./components/pages/loginPage";
 // import Signup from "./components/pages/mf/Signup";
 // import ResetPassword from "./components/pages/mf/ResetPassword";
 
 function App() {
-  const [currentTime, setCurrentTime] = useState(0);
-
-  useEffect(() => {
-    fetch('/api/time').then(res => res.json()).then(data => {
-      setCurrentTime(data.time);
-    });
-  }, []);
-
   return (
       <div className="App">
         <BrowserRouter>

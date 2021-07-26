@@ -108,8 +108,6 @@ def get_food_search_result(food_name: str = '',
 	query_results = connection.execute(query).fetchall()
 	connection.close()
 
-	#print(query_results)
-
 	food_list = []
 
 	fn_item = dict()
@@ -124,7 +122,6 @@ def get_food_search_result(food_name: str = '',
 			current_fdc_id = result_tuple[0]
 
 			if 'protein' not in fn_item:
-				print('1 triggered')
 				fn_item['protein'] = 'n/a'
 			if 'calories' not in fn_item:
 				fn_item['calories'] = 'n/a'
@@ -222,7 +219,8 @@ def update_user_password(user_id: int, password: str) -> None:
     connection.close()
 
 def delete_user(user_id: int) -> None:
-    """ remove entries based on user ID """
+    ''' remove entries based on user ID 
+			  other tables with user_id as foreign key are updated to be on delete cascade.'''
     connection = db.connect()
     account_deletion = 'Delete From user_profile where id={};'.format(user_id)
     connection.execute(account_deletion)

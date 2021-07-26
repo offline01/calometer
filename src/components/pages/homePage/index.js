@@ -42,7 +42,8 @@ class HomePageView extends React.Component {
         console.log(args)
         fetch('/api/food_search', args)
             .then(res => res.json())
-            .then(jsonStr => this.setState({foods: jsonStr['foods']}))
+            .then(jsonStr => this.setState({foods: jsonStr['search_result']}))
+						.then(output => console.log(output))
 
         // dummy code below -> wait for backend API to be finished
         // this.setState({foodName: "suibian"})
