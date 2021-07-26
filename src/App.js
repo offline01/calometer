@@ -3,8 +3,8 @@ import { BrowserRouter, Link, Switch, Route } from 'react-router-dom';
 import './App.css';
 import HomePageView from "./components/pages/homePage";
 import Login from "./components/pages/loginPage";
-import Signup from "./components/pages/mf/Signup";
-import ResetPassword from "./components/pages/mf/ResetPassword";
+// import Signup from "./components/pages/mf/Signup";
+// import ResetPassword from "./components/pages/mf/ResetPassword";
 
 function App() {
   const [currentTime, setCurrentTime] = useState(0);
@@ -26,7 +26,7 @@ function App() {
           <Switch>
             <Route exact path="/" component={HomePageView}></Route>
             <Route path="/login" component={Login}></Route>
-            <Route path="/signup" component={Signup}></Route>
+            {/*<Route path="/signup" component={Signup}></Route>*/}
             {/*<Route path="/resetpassword" component={ResetPassword} />*/}
           </Switch>
         </BrowserRouter>
