@@ -24,11 +24,11 @@ class App extends React.Component {
           <form id="contact-form" onSubmit={this.handleSubmit.bind(this)} method="POST">
             <div className="form-group">
               <label htmlFor="email">Email</label>
-              <input type="email" className="form-control" value={this.state.email} onChange={this.onNameChange.bind(this)} />
+              <input type="email" className="form-control" value={this.state.email} onChange={this.onMessageChange.bind(this)} />
             </div>
             <div className="form-group">
               <label htmlFor="username">User name</label>
-              <input type="text" className="form-control" aria-describedby="emailHelp" value={this.state.username} onChange={this.onEmailChange.bind(this)} />
+              <input type="text" className="form-control" aria-describedby="emailHelp" value={this.state.username} onChange={this.onMessageChange.bind(this)} />
             </div>
             <div className="form-group">
               <label htmlFor="password">Password</label>
@@ -59,29 +59,29 @@ class App extends React.Component {
       );
     }
   
-    onNameChange(event) {
+    onMessageChange(event) {
       this.setState({email: event.target.value})
     }
   
-    onEmailChange(event) {
+    onMessageChange(event) {
       this.setState({username: event.target.value})
     }
   
-    onEmailChange(event) {
+    onMessageChange(event) {
         this.setState({password: event.target.value})
     }
 
-    onEmailChange(event) {
+    onMessageChange(event) {
       this.setState({firstname: event.target.value})
     }
 
-    onEmailChange(event) {
+    onMessageChange(event) {
         this.setState({lastname: event.target.value})
     }
     onMessageChange(event) {
       this.setState({dateofbirth: event.target.value})
     }
-    onEmailChange(event) {
+    onMessageChange(event) {
         this.setState({sex: event.target.value})
     }
     handleSubmit(event) {
