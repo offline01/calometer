@@ -3,8 +3,8 @@ import { BrowserRouter, Link, Switch, Route } from 'react-router-dom';
 // import './App.css';
 import HomePageView from "./components/pages/homePage";
 import Login from "./components/pages/loginPage";
-import Signup from "./components/pages/mf/Signup";
 import {ResetPassword} from "./components/pages/passwordReset/ResetPassword";
+import Signup from "./components/pages/signUp";
 
 function App() {
   return (
