@@ -1,4 +1,6 @@
-from app import db
+#from sqlalchemy.util.langhelpers import set_creation_order
+from app import db_engine
+from sqlalchemy import exc as execution_exception
 
 def generate_food_search_query(food_name: str = '', 
 	protein_low: float =-1, protein_high: float =-1,
@@ -104,7 +106,7 @@ def get_food_search_result(food_name: str = '',
 																		 fat_low, fat_high,
 																		 carbo_low, carbo_high)
 
-	connection = db.connect()
+	connection = db_engine.connect()
 	query_results = connection.execute(query).fetchall()
 	connection.close()
 
@@ -162,84 +164,52 @@ def get_food_search_result(food_name: str = '',
 
 def register_user(register_email: str, user_name: str, password: str, 
 	first_name: str, last_name: str, date_of_birth: str, sex: int) -> int:
-	unique_email_check_query = ('SELECT * '
-														  'FROM User_account '
-															'WHERE email = \'' + register_email + '\';')
-
-	connection = db.connect()
-
-	unique_check = connection.execute(unique_email_check_query).first()
-	if unique_check != None:
-		return -1
-
-	user_id_query = ('SELECT MAX(user_id) FROM User_profile;')
-	latest_id_check = connection.execute(user_id_query).first()
-
-	print(latest_id_check)
-
-	new_user_id = 1
-	if latest_id_check[0] != None:
-		new_user_id = latest_id_check[0] + 1
-
-
+	new_id = 0
+	register_query = 'CALL register_user(\'' + register_email + '\', \'' + user_name + '\', \'' + password + '\', \'' + first_name + '\', \'' + last_name + \
+		'\', \'' + date_of_birth + '\', ' + str(sex) + ', @new_user_id);'
+	result_query = 'SELECT @new_user_id;'
 	
-	profile_insertion_query = ('INSERT INTO User_profile (user_id, last_name, first_name, date_of_birth, Sex) '
-														 'VALUES (' + str(new_user_id) + ', \'' + last_name + '\', \'' + first_name + '\', \'' + date_of_birth + '\', ' + str(sex) + ');')
-	# order of insertion: email, user_id, user_name, password
-	account_insertion_query = ('INSERT INTO User_account (email, user_id, user_name, password) '
-					 									 'VALUES (\'' + register_email + '\', ' + str(new_user_id) + ', \'' + user_name + '\', \'' + password + '\');')
+	connection = db_engine.connect()
+	try:	
+		connection.execute(register_query)
+		result = connection.execute(result_query).first()
 
-	# order of insertion: user_id, last_name, first_name, date_of_birth, Sex
-	# note that the date_of_birth field must be in the form of yyyy-mm-dd 
-	
-	connection.execute(profile_insertion_query)
-	connection.execute(account_insertion_query)
-	
-	connection.close()
+		new_id = result[0]
+	except execution_exception.IntegrityError: 
+		new_id = -2
+	except:
+	 	new_id = -1
 
-	return new_user_id
+	return new_id
 
 def login_user(provided_email: str, provided_pw: str) -> int:
 	login_request = ('SELECT user_id '
 	                 'FROM User_account '
 									 'WHERE email = \'' + provided_email + '\' AND password = \'' + provided_pw + '\';')
 
-	connection = db.connect()
+	connection = db_engine.connect()
 	login_user_id = connection.execute(login_request).first()
 
-	print(login_user_id)
+	# print(login_user_id)
 
 	if login_user_id == None:
 		return -1
 	else:
 		return int(login_user_id[0])
 
-#def update_user(user_id: int, first_name: str, last_name: str, date_of_birth: str, sex: int) -> None:
-def update_user_password(user_id: int, password: str) -> None:
-    connection = db.connect()
-    query = 'Update user_account set password = "{}" where id = {};'.format(password, user_id)
-    connection.execute(query)
-    connection.close()
+def update_user_password(email: str, old_password: str, new_password: str) -> int:
+	query = 'select * from user_account'
+
+	connection = db_engine.connect()
+	connection.execute(query)
+	connection.close()
+
+	return 1
 
 def delete_user(user_id: int) -> None:
     ''' remove entries based on user ID 
 			  other tables with user_id as foreign key are updated to be on delete cascade.'''
-    connection = db.connect()
-    account_deletion = 'Delete From user_profile where id={};'.format(user_id)
+    connection = db_engine.connect()
+    account_deletion = 'Delete From user_profile where user_id={};'.format(user_id)
     connection.execute(account_deletion)
     connection.close()
-
-
-
-def get_user_goals(user_id: int) -> None:
-	pass  
-
-def add_user_goal(current_weight: float, goal_weight: float) -> None:
-	pass
-
-def update_user_goal(user_id: int, goal_id: int) -> None:
-	pass
-
-def delete_user_goal(user_id: int, goal_id: int) -> None:
-	pass
-
