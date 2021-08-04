@@ -44,3 +44,29 @@ def register():
         sex = user_info['sex']
 
     return jsonify({'status': 'success'})
+
+@app.route('/api/user/login', methods=['POST'])
+def login():
+	if request.method == 'POST':
+		login_info = request.get_json()
+
+		email = login_info['email']
+		password = login_info['pwd']
+
+	return jsonify({'status': 'success'})
+
+@app.route('/api/user/change_password', methods=['POST'])
+def change_pwd():
+	if request.method == 'POST':
+		pwd_change_info = request.get_json()
+
+		email = pwd_change_info['email']
+		old_pwd = pwd_change_info['old_pwd']
+		new_pwd = pwd_change_info['new_pwd']
+
+		status = db_helper.update_user_password(email, old_pwd, new_pwd)
+
+		if status <= 0:
+			return jsonify({'status':'failed'})
+		else:
+			return jsonify({'status':'success'})

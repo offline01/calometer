@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./Login.css";
 import { Link } from "react-router-dom";
+import fetch from "isomorphic-fetch";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -14,6 +15,19 @@ export default function Login() {
 
     function handleSubmit(event) {
         event.preventDefault();
+        const body = {
+            email: email,
+            pwd: password
+        }
+        console.log(body);
+        const args = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }
+        fetch('/api/user/login', args)
+            .then(res => res.json())
+            .then(str => console.log(str['status']))
     }
 
     return (
