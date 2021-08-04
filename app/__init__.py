@@ -34,10 +34,10 @@ def init_connect_engine() -> sqlalchemy.engine.Engine:
 
 db_engine = init_connect_engine()
 
-from app import database
+#from app import database
 #print(database.register_user(register_email='fuck@fuck.fuck', user_name='fuck', password='fuckfuckfuck', first_name='fucker', last_name='sucker', date_of_birth='1145-11-19', sex=1))
 #print(database.login_user(provided_email='fuck@fuck.fuck', provided_pw='fuckfuckfuck'))
 #print(database.update_user_password(email='fuck@fuck.fuck', old_password='fuckthisproject', new_password='fuckthisproject'))
-database.delete_user(1)
+#database.delete_user(1)
 
 from app import routes
