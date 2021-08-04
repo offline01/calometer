@@ -63,10 +63,11 @@ def change_pwd():
 		email = pwd_change_info['email']
 		old_pwd = pwd_change_info['old_pwd']
 		new_pwd = pwd_change_info['new_pwd']
+	return jsonify({'status':'success'})
 
-		status = db_helper.update_user_password(email, old_pwd, new_pwd)
-
-		if status <= 0:
-			return jsonify({'status':'failed'})
-		else:
-			return jsonify({'status':'success'})
+@app.route('/api/user/delete_user', methods=['POST'])
+def delete_account():
+	if request.method == 'POST':
+		target_account = request.get_json()
+		target_user_id = target_account['user_id']
+	return jsonify({'status': 'success'})
