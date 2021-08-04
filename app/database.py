@@ -1,5 +1,7 @@
 #from sqlalchemy.util.langhelpers import set_creation_order
 from typing import final
+
+from sqlalchemy.sql.expression import delete
 from app import db_engine
 from sqlalchemy import exc as execution_exception
 
@@ -95,6 +97,7 @@ def generate_food_search_query(food_name: str = '',
 
 	return query
 
+
 def get_food_search_result(food_name: str = '', 
 	protein_low: float = -1, protein_high: float = -1,
 	calorie_low: float = -1, calorie_high: float = -1,
@@ -158,8 +161,6 @@ def get_food_search_result(food_name: str = '',
 		fn_item['carbohydrate'] = 'n/a'
 
 	food_list.append(fn_item)
-
-	print(food_list)
 
 	return food_list
 
@@ -229,8 +230,51 @@ def delete_user(user_id: int) -> None:
 	finally:
 		connection.close()
 
-def advanced_query_1() -> None:
-	pass
+def advanced_query_1() -> list:
+	query_1 = ('select f.description, fn.Amount '
+						'from Food f natural join Food_nutrient fn '
+						'where nutrient_id = 1003 and fn.Amount = ( select MAX(Amount) from Food_nutrient where nutrient_id = 1003 );')
+	connection = db_engine.connect()
+	results = connection.execute(query_1).fetchall()
+	connection.close()
 
-def advanced_query_2() -> None:
-	pass
+	food_list = list()
+	for tuple in results:
+		item = dict()
+		item['food_name'] = tuple[0]
+		item['protein'] = 'n/a'
+		item['calories'] = 'n/a'
+		item['fat'] =  'n/a'
+		item['carbohydrate'] = 'n/a'
+		food_list.append(item)
+
+		del item
+	
+	return food_list
+	
+
+def advanced_query_2() -> list:
+	query_2 = ('(SELECT f.description, fn.Amount '
+						'FROM Food f NATURAL JOIN Food_nutrient fn '
+						'WHERE fn.nutrient_id = 1003 AND fn.Amount > 40) '
+						'union '
+						'(SELECT f.description, fn.Amount '
+						'FROM Food f NATURAL JOIN Food_nutrient fn '
+						'WHERE fn.nutrient_id = 1085 AND fn.Amount < 60) limit 15;')
+	connection = db_engine.connect()
+	results = connection.execute(query_2).fetchall()
+	connection.close()
+
+	food_list = list()
+	for tuple in results:
+		item = dict()
+		item['food_name'] = tuple[0]
+		item['protein'] = 'n/a'
+		item['calories'] = 'n/a'
+		item['fat'] =  'n/a'
+		item['carbohydrate'] = 'n/a'
+		food_list.append(item)
+
+		del item
+	
+	return food_list

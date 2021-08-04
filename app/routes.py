@@ -1,3 +1,4 @@
+from warnings import resetwarnings
 from app import app
 from flask import json, render_template, request, jsonify
 import json
@@ -5,11 +6,15 @@ from app import database as db_helper
 
 @app.route('/api/advanced_query_1', methods=['POST'])
 def advanced_query_1():
-	pass
+	search_result = db_helper.advanced_query_1()
+
+	return jsonify({'status':'success', 'search_result': search_result})
 
 @app.route('/api/advanced_query_2', methods=['POST'])
 def advanced_query_2():
-	pass
+	search_result = db_helper.advanced_query_2()
+
+	return jsonify({'status':'success', 'search_result': search_result})
 
 # @app.route('/api/test_response', methods=['POST'])
 # def test_response():
