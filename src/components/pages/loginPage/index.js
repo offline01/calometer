@@ -51,7 +51,7 @@ export default function Login() {
                     />
                 </Form.Group>
 
-                <Link to="/login/reset">Forgot password?</Link> 
+
     
                 <Button block size="lg" type="submit" disabled={!validateForm()}>
                     Login
