@@ -19,7 +19,31 @@ class HomePageView extends React.Component {
             ch_high: -1
         }
         this.searchFood = this.searchFood.bind(this);
+        this.advancedQuery1 = this.advancedQuery1.bind(this);
+        this.advancedQuery2 = this.advancedQuery2.bind(this);
         this.handelSearchBoxChange = this.handelSearchBoxChange.bind(this);
+    }
+
+    advancedQuery1() {
+        const args = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }
+        console.log(args)
+        fetch('/api/advanced_query_1', args)
+            .then(res => res.json())
+            .then(jsonStr => this.setState({foods: jsonStr['search_result']}))
+    }
+
+    advancedQuery2() {
+        const args = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }
+
+        fetch('/api/advanced_query_2', args)
+            .then(res => res.json())
+            .then(jsonStr => this.setState({foods: jsonStr['search_result']}))
     }
 
     searchFood() {
@@ -44,8 +68,9 @@ class HomePageView extends React.Component {
             .then(res => res.json())
             .then(jsonStr => this.setState({foods: jsonStr['search_result']}))
 
-        // dummy code below -> wait for backend API to be finished
-        // this.setState({foodName: "suibian"})
+
+
+
     }
 
     handelSearchBoxChange(e) {
@@ -68,10 +93,10 @@ class HomePageView extends React.Component {
                             <Typography variant="subtitle1">Do you want to eat smarter and workout smarter?</Typography>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained">Start for free</Button>
+                            <Button variant="contained" onClick={this.advancedQuery1}>Advanced Query 1</Button>
                         </Grid>
                         <Grid item>
-                            <Button variant="contained">login</Button>
+                            <Button variant="contained" onClick={this.advancedQuery2}>Advanced Query 2</Button>
                         </Grid>
                     </Grid>
                 </div>

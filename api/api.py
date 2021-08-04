@@ -71,3 +71,19 @@ def delete_account():
 		target_account = request.get_json()
 		target_user_id = target_account['user_id']
 	return jsonify({'status': 'success'})
+
+@app.route('/api/advanced_query_1', methods=['POST'])
+def advanced_query_1():
+	search_result = db_helper.advanced_query_1()
+
+	return jsonify({'status':'success', 'search_result': search_result})
+
+@app.route('/api/advanced_query_2', methods=['POST'])
+def advanced_query_2():
+    return {'search_result': [{
+            'food_name': 'cake1',
+            'fat': 11,
+            'protein': 12,
+            'calories': 13,
+            'carbohydrate': 14
+        }]}
