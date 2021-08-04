@@ -97,7 +97,6 @@ def generate_food_search_query(food_name: str = '',
 
 	return query
 
-
 def get_food_search_result(food_name: str = '', 
 	protein_low: float = -1, protein_high: float = -1,
 	calorie_low: float = -1, calorie_high: float = -1,
@@ -252,7 +251,6 @@ def advanced_query_1() -> list:
 	
 	return food_list
 	
-
 def advanced_query_2() -> list:
 	query_2 = ('(SELECT f.description, fn.Amount '
 						'FROM Food f NATURAL JOIN Food_nutrient fn '

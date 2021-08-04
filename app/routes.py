@@ -112,6 +112,13 @@ def delete_account():
 
 		return jsonify({'status': 'success'})	
 
+@app.route('/api/user/add_entries', methods=['POST'])
+def add_entry():
+	pass
+
+@app.route('/api/user/remove_entries', methods=['POST'])
+def remove_entry():
+	pass
 # @app.route('/api/goals/get_user_goals', methods=['POST'])
 # def goals():
 # 	return render_template('test_template.html', name='cyka blyat')
