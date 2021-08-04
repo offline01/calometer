@@ -1,4 +1,5 @@
 #from sqlalchemy.util.langhelpers import set_creation_order
+from typing import final
 from app import db_engine
 from sqlalchemy import exc as execution_exception
 
@@ -183,33 +184,53 @@ def register_user(register_email: str, user_name: str, password: str,
 	return new_id
 
 def login_user(provided_email: str, provided_pw: str) -> int:
-	login_request = ('SELECT user_id '
-	                 'FROM User_account '
-									 'WHERE email = \'' + provided_email + '\' AND password = \'' + provided_pw + '\';')
+	login_request = 'CALL login_user(\'' + provided_email + '\', \'' + provided_pw + '\', @curr_user_id);'
+	result_query = 'select @curr_user_id;'
+
+	login_user_id = 0
 
 	connection = db_engine.connect()
-	login_user_id = connection.execute(login_request).first()
+	try:
+		connection.execute(login_request)
+		result = connection.execute(result_query).first()
+		login_user_id = result[0]
+	except:
+		login_user_id = -1
+	finally:
+		connection.close()
 
-	# print(login_user_id)
-
-	if login_user_id == None:
-		return -1
-	else:
-		return int(login_user_id[0])
+	return login_user_id
 
 def update_user_password(email: str, old_password: str, new_password: str) -> int:
-	query = 'select * from user_account'
+	status = 0
+	update_query = 'CALL update_user_password(\'' + email + '\', \'' + old_password + '\', \'' + new_password + '\', @stat);'
+	status_query = 'select @stat;'
 
 	connection = db_engine.connect()
-	connection.execute(query)
-	connection.close()
+	try:
+		connection.execute(update_query)
+		result = connection.execute(status_query).first()
+		status = result[0]
+	except:
+		status = -1
+	finally:
+		connection.close()
 
-	return 1
+	return status
 
 def delete_user(user_id: int) -> None:
-    ''' remove entries based on user ID 
-			  other tables with user_id as foreign key are updated to be on delete cascade.'''
-    connection = db_engine.connect()
-    account_deletion = 'Delete From user_profile where user_id={};'.format(user_id)
-    connection.execute(account_deletion)
-    connection.close()
+	deletion_query = 'CALL delete_user(' + str(user_id) + ');'
+
+	connection = db_engine.connect()
+	try:
+		connection.execute(deletion_query)
+	except:
+		pass
+	finally:
+		connection.close()
+
+def advanced_query_1() -> None:
+	pass
+
+def advanced_query_2() -> None:
+	pass

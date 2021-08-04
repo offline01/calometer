@@ -3,13 +3,21 @@ from flask import json, render_template, request, jsonify
 import json
 from app import database as db_helper
 
-@app.route('/api/test_response', methods=['POST'])
-def test_response():
-	test_info = request.get_json()
+@app.route('/api/advanced_query_1', methods=['POST'])
+def advanced_query_1():
+	pass
 
-	print(test_info)
+@app.route('/api/advanced_query_2', methods=['POST'])
+def advanced_query_2():
+	pass
 
-	return jsonify({'fuck':'you', 'cyka':'blyat', 'wdnmd':'nmsl', 'sent':test_info['sent']})
+# @app.route('/api/test_response', methods=['POST'])
+# def test_response():
+# 	test_info = request.get_json()
+
+# 	print(test_info)
+
+# 	return jsonify({'fuck':'you', 'cyka':'blyat', 'wdnmd':'nmsl', 'sent':test_info['sent']})
 
 @app.route('/api/food_search', methods=['POST'])
 def search_food():
@@ -51,10 +59,10 @@ def register():
 		sex = user_info['sex']
 
 		new_user_id = db_helper.register_user(email, user_name, password, first_name, last_name, date_of_birth, sex)
-		if new_user_id != -1:
-			return jsonify({'status': 'success', 'new_user_id': new_user_id})
-		else:
+		if new_user_id <= 0:
 			return jsonify({'status': 'failed'})
+		else:
+			return jsonify({'status': 'success', 'new_user_id': new_user_id})
 
 @app.route('/api/user/login', methods=['POST'])
 def login():
@@ -77,11 +85,15 @@ def change_pwd():
 		pwd_change_info = request.get_json()
 
 		email = pwd_change_info['email']
-		new_pwd = pwd_change_info['pwd']
+		old_pwd = pwd_change_info['old_pwd']
+		new_pwd = pwd_change_info['new_pwd']
 
-		db_helper.update_user_password(email, new_pwd)
+		status = db_helper.update_user_password(email, old_pwd, new_pwd)
 
-		return jsonify({'status': 'success'})
+		if status <= 0:
+			return jsonify({'status':'failed'})
+		else:
+			return jsonify({'status':'success'})
 
 @app.route('/api/user/delete_user', methods=['POST'])
 def delete_account():
@@ -95,15 +107,15 @@ def delete_account():
 
 		return jsonify({'status': 'success'})	
 
-@app.route('/api/goals/get_user_goals', methods=['POST'])
-def goals():
-	return render_template('test_template.html', name='cyka blyat')
+# @app.route('/api/goals/get_user_goals', methods=['POST'])
+# def goals():
+# 	return render_template('test_template.html', name='cyka blyat')
 
-@app.route('/api/goals/add_goals', methods=['POST'])
-def add_goals():
-	return render_template('test_template.html', name='cyka blyat')
+# @app.route('/api/goals/add_goals', methods=['POST'])
+# def add_goals():
+# 	return render_template('test_template.html', name='cyka blyat')
 
-@app.route('/api/goals/get_daily_entry', methods=['POST'])
-def daily_entry():
-	return render_template('test_template.html', name='cyka blyat')
+# @app.route('/api/goals/get_daily_entry', methods=['POST'])
+# def daily_entry():
+# 	return render_template('test_template.html', name='cyka blyat')
 
